@@ -2,9 +2,7 @@ import { computed } from '@angular/core';
 import {
   patchState,
   signalStore,
-  watchState,
   withComputed,
-  withHooks,
   withMethods,
   withProps,
   withState,
@@ -19,7 +17,7 @@ type SignalState = {
 
 export const CounterStore = signalStore(
   withState<SignalState>({
-    by: 1,
+    by: 3,
     current: 0,
   }),
   withProps(() => {
@@ -41,21 +39,5 @@ export const CounterStore = signalStore(
       decrementDisabled: computed(() => store.current() - store.by() < 0),
       isEven: computed(() => store.current() % 2 === 0),
     };
-  }),
-  withHooks({
-    onInit(store) {
-      const savedState = localStorage.getItem('counter-data'); // "string" | null
-      if (savedState !== null) {
-        const newState = JSON.parse(savedState) as unknown as SignalState; // using "as" is SUSPECT. Be careful here.
-        patchState(store, newState);
-      }
-
-      watchState(store, (current) => {
-        localStorage.setItem('counter-data', JSON.stringify(current));
-      });
-    },
-    onDestroy() {
-      console.log('Destroying the Counter Store');
-    },
   }),
 );
